@@ -3,6 +3,7 @@ import CommentLists from "./CommentLists";
 import { v4 as uuidv4 } from 'uuid'
 import poster from './img/images.png'
 import moment from "moment";
+import axios from 'axios'
 
 
 const CommentsContainer = () => {
@@ -10,6 +11,7 @@ const CommentsContainer = () => {
   const [commentText, setText] = useState('');
 
   const commentsList = comments.filter((c) => c.parentId === null);
+
   const getReplies = (commentId) =>
     comments
       .filter((comment) => comment.parentId === commentId)
@@ -19,48 +21,44 @@ const CommentsContainer = () => {
       );
 
   const addComment = () => {
-    setComments([{
+    const comment = {
       id: uuidv4(),
-      parentId: null,
       text: commentText,
+      parentId: null,
       created: moment().utc().valueOf(),
-    }, ...comments]);
-    setText('');
+    }
+    try {
+      axios.post('/api/save', comment).then(() => {
+        setComments([comment, ...comments]);
+        setText('');
+      });
+    } catch (err) {
+      console.log("Post comment failed", err)
+    }
   };
 
   const addReply = (reply) => {
-    console.log('reply', reply)
-    setComments([{
+    const comment = {
       id: uuidv4(),
       text: reply.text,
       parentId: reply.parentId,
       created: moment().utc().valueOf(),
-    }, ...comments]);
+    }
+    try {
+      axios.post('/api/save', comment).then(() => {
+        setComments([comment, ...comments]);
+      });
+    } catch (err) {
+      console.log('Reply failed', err)
+    }
   };
 
-  const updateComment = (commentId) => {
-    const updatedComments = comments.map(comment => {
-      if (comment.id === commentId) {
-        return { ...comment, body: commentText };
-      }
-      return comment;
+  useEffect(() => {
+    axios.get('/api/getcomments').then(resp => {
+      const data = Object.values(resp.data)
+      setComments(data);
     });
-    setComments(updatedComments);
-    setText('');
-  };
-
-  const deleteComment = (commentId) => {
-    const updatedComments = comments.filter(
-      (comment) => comment.id !== commentId
-    );
-    setComments(updatedComments);
-  }
-
-  // useEffect(() => {
-  //   getCommentsApi().then((data) => {
-  //     setBackendComments(data);
-  //   });
-  // }, []);
+  }, []);
 
   return (
     <div className="container">
@@ -73,10 +71,8 @@ const CommentsContainer = () => {
           <CommentLists
             key={comment.id}
             comment={comment}
-            edit={updateComment}
             addReply={addReply}
             commentsList={comments}
-            deleteComment={deleteComment}
             replyComments={getReplies(comment.id)}
           />
         )}
