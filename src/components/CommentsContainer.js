@@ -3,8 +3,7 @@ import CommentLists from "./CommentLists";
 import { v4 as uuidv4 } from 'uuid'
 import poster from './img/images.png'
 import moment from "moment";
-import axios from 'axios'
-
+import { addCommentDb, getcommentsDb } from './api/Api'
 
 const CommentsContainer = () => {
   const [comments, setComments] = useState([]);
@@ -20,7 +19,7 @@ const CommentsContainer = () => {
           new Date(a.created).getTime() - new Date(b.created).getTime()
       );
 
-  const addComment = () => {
+  const addComment = async () => {
     const comment = {
       id: uuidv4(),
       text: commentText,
@@ -28,16 +27,16 @@ const CommentsContainer = () => {
       created: moment().utc().valueOf(),
     }
     try {
-      axios.post('/api/save', comment).then(() => {
-        setComments([comment, ...comments]);
-        setText('');
-      });
+      await addCommentDb(comment)
+      setComments([comment, ...comments]);
+      setText('');
+
     } catch (err) {
       console.log("Post comment failed", err)
     }
   };
 
-  const addReply = (reply) => {
+  const addReply = async (reply) => {
     const comment = {
       id: uuidv4(),
       text: reply.text,
@@ -45,25 +44,27 @@ const CommentsContainer = () => {
       created: moment().utc().valueOf(),
     }
     try {
-      axios.post('/api/save', comment).then(() => {
-        setComments([comment, ...comments]);
-      });
+      await addCommentDb(comment)
+      setComments([comment, ...comments]);
+
     } catch (err) {
       console.log('Reply failed', err)
     }
   };
 
+  const getcomments = async () => {
+    const data = await getcommentsDb()
+    setComments(data);
+  }
+
   useEffect(() => {
-    axios.get('/api/getcomments').then(resp => {
-      const data = Object.values(resp.data)
-      setComments(data);
-    });
+    getcomments()
   }, []);
 
   return (
     <div className="container">
       <div className="poster-container">
-        <img src={poster} alt="" className="poster" />
+        <img src={poster} alt="poster" className="poster" />
       </div>
 
       <div className="mt-20">
@@ -83,18 +84,21 @@ const CommentsContainer = () => {
           <input
             value={commentText}
             className="inputBox"
+            data-testid='comment_input'
             onChange={(e) => setText(e.target.value)}
           />
         </div>
         <div className="flex row-reverse ml-10">
           {commentText && (
-            <button onClick={() => setText('')}>Cancel</button>
+            <button data-testid="clear_text" onClick={() => setText('')}>Cancel</button>
           )}
 
           <button
             disabled={!commentText}
             onClick={addComment}
-            className="post-but">
+            className="post-but"
+            data-testid="save_comment"
+          >
             Post
           </button>
         </div>
