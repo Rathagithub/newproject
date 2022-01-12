@@ -9,7 +9,7 @@ const CommentsContainer = () => {
   const [comments, setComments] = useState([]);
   const [commentText, setText] = useState('');
 
-  const commentsList = comments.filter((c) => c.parentId === null);
+  const commentsList = comments.length ? comments.filter((c) => c.parentId === null) : []
 
   const getReplies = (commentId) =>
     comments
@@ -26,13 +26,10 @@ const CommentsContainer = () => {
       parentId: null,
       created: moment().utc().valueOf(),
     }
-    try {
-      await addCommentDb(comment)
-      setComments([comment, ...comments]);
+    const resp = await addCommentDb(comment)
+    if (resp) {
+      setComments([resp, ...comments]);
       setText('');
-
-    } catch (err) {
-      console.log("Post comment failed", err)
     }
   };
 
@@ -43,18 +40,13 @@ const CommentsContainer = () => {
       parentId: reply.parentId,
       created: moment().utc().valueOf(),
     }
-    try {
-      await addCommentDb(comment)
-      setComments([comment, ...comments]);
-
-    } catch (err) {
-      console.log('Reply failed', err)
-    }
+    const resp = await addCommentDb(comment)
+    if (resp) setComments([resp, ...comments]);
   };
 
   const getcomments = async () => {
     const data = await getcommentsDb()
-    setComments(data);
+    if (data) setComments(data);
   }
 
   useEffect(() => {

@@ -6,7 +6,7 @@ const getcommentsDb = async () => {
   const data = Object.values(resp.data)
   return data
  } catch (err) {
-  return err
+  console.log("fetch commets failed", err)
  }
 }
 
@@ -15,7 +15,7 @@ const addCommentDb = async (comment) => {
   await axios.post('/api/save', comment)
   return comment
  } catch (err) {
-  return err
+  console.log("post commet failed", err)
  }
 }
 
