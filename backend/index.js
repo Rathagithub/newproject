@@ -17,7 +17,6 @@ app.listen(PORT, () => {
 });
 
 module.exports = function (app) {
- app.use(createProxyMiddleware('/api/**', {
-  target: 'http://localhost:8001'
- }));
+ app.use(createProxyMiddleware('/api/**', { target: 'http://localhost:5000' }));
+ app.use(createProxyMiddleware('/otherApi/**', { target: 'http://localhost:5000' }));
 };
