@@ -10,13 +10,11 @@ app.use(bodyParser.json());
 app.use(cors())
 app.use('/api', routesHandler);
 
-port = 8001
+let PORT = process.env.PORT || 8001
 
-app.listen(port, () => {
+app.listen(PORT, () => {
  console.log("Server is running on port 8001.");
 });
-
-
 
 module.exports = function (app) {
  app.use(createProxyMiddleware('/api/**', {
