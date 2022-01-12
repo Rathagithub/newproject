@@ -8,6 +8,10 @@ app.use(bodyParser.json());
 app.use(cors())
 app.use('/api', routesHandler);
 
-app.listen(4001, () => {
- console.log("Server is running on port 4001.");
+port = 8001
+
+app.listen(port, () => {
+ console.log("Server is running on port 8001.");
 });
+
+module.exports = app
