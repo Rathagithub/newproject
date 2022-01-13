@@ -22,3 +22,11 @@ describe("Post comments", () => {
   expect(response.statusCode).toBe(200);
  });
 });
+
+describe("Delete all comments", () => {
+ test('Delete comments', async () => {
+  expect.assertions(1);
+  const response = await request(app).delete('/api/delete-all')
+  expect(response.statusCode).toBe(200);
+ });
+});

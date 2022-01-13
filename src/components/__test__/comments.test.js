@@ -4,22 +4,26 @@ import userEvent from '@testing-library/user-event';
 
 it('renders Comments Container', () => {
  render(<CommentsContainer />)
+});
+
+it('CheckPosterLoaded', () => {
+ render(<CommentsContainer />)
  const poster = screen.getByRole('img');
  expect(poster).toHaveAttribute('src', 'images.png');
  expect(poster).toHaveAttribute('alt', 'poster');
 });
 
-it('renders Comments Container', () => {
+it('CheckInputBoxLoaded', () => {
  render(<CommentsContainer />)
  screen.getByTestId("comment_input");
 });
 
-it('renders Comments Container', () => {
+it('CheckPostButtonLoaded', () => {
  render(<CommentsContainer />)
  screen.getByTestId("save_comment")
 });
 
-describe("ClickPostButton", () => {
+describe("ClickPostButtonClick", () => {
  it("click", () => {
   render(<CommentsContainer />)
   const commentInput = screen.getByTestId("comment_input");

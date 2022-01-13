@@ -5,12 +5,22 @@ const CommentLists = ({ comment, commentsList, addReply, replyComments }) => {
 
   const getReplies = (id) => {
     return (commentsList || []).filter(c => c.parentId === id)
-      .sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
   }
 
   const addMargin = comment?.parentId ? 'ml-5' : ''
+
+  const replyComment = (replyComments || []).map(reply => {
+    return (
+      <CommentLists
+        key={comment.id}
+        comment={reply}
+        addReply={addReply}
+        onSetReply={() => { }}
+        commentsList={commentsList}
+        replyComments={getReplies(reply.id)}
+      />
+    )
+  })
 
   return (
     <div className="flex row comment-container m-5">
@@ -18,34 +28,28 @@ const CommentLists = ({ comment, commentsList, addReply, replyComments }) => {
         <h4 className="h-0">{comment?.text}</h4>
         <p
           className="comment-but"
-          data-testid="click_reply"
+          data-testid={`click_reply${comment.id}`}
           onClick={() => setReply({ parentId: comment.id, text: '' })}
         >
           <a href="#">Reply</a>
         </p>
-        {(replyComments || []).map(reply => (
-          <CommentLists
-            key={comment.id}
-            comment={reply}
-            addReply={addReply}
-            onSetReply={() => { }}
-            replyComments={getReplies(reply.id)}
-          />
-        ))}
+
+        {replyComment}
+
         {reply.parentId && (
           <div className="flex row">
             <div className="w-80">
               <input
                 value={reply.text}
                 className="inputBox"
-                data-testid="reply_input"
+                data-testid={`reply_input${comment.id}`}
                 onChange={(e) => setReply({ ...reply, text: e.target.value })}
               />
             </div>
             <div className="flex row-reverse ml-10">
               {reply.text && (
                 <button
-                  data-testid="cancel_reply"
+                  data-testid={`cancel_reply${comment.id}`}
                   onClick={() => setReply({ parentId: null, text: '' })}
                 >
                   Cancel
@@ -54,7 +58,7 @@ const CommentLists = ({ comment, commentsList, addReply, replyComments }) => {
 
               <button
                 className="post-but"
-                data-testid="save_reply"
+                data-testid={`save_reply${comment.id}`}
                 disabled={!reply.text}
                 onClick={() => {
                   addReply(reply)

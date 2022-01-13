@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CommentLists from "./CommentLists";
 import { v4 as uuidv4 } from 'uuid'
-import poster from './img/images.png'
+import poster from './img/poster.jpeg'
 import moment from "moment";
 import { addCommentDb, getcommentsDb } from './api/Api'
 
@@ -11,13 +11,7 @@ const CommentsContainer = () => {
 
   const commentsList = comments.length ? comments.filter((c) => c.parentId === null) : []
 
-  const getReplies = (commentId) =>
-    comments
-      .filter((comment) => comment.parentId === commentId)
-      .sort(
-        (a, b) =>
-          new Date(a.created).getTime() - new Date(b.created).getTime()
-      );
+  const getReplies = (commentId) => comments.filter((comment) => comment.parentId === commentId)
 
   const addComment = async () => {
     const comment = {
@@ -26,10 +20,13 @@ const CommentsContainer = () => {
       parentId: null,
       created: moment().utc().valueOf(),
     }
-    const resp = await addCommentDb(comment)
-    if (resp) {
-      setComments([resp, ...comments]);
+    try {
+      const resp = await addCommentDb(comment)
+      setComments([...comments, resp]);
       setText('');
+    } catch (err) {
+      console.log('err', err)
+      window.alert('Comment post failed')
     }
   };
 
@@ -40,13 +37,23 @@ const CommentsContainer = () => {
       parentId: reply.parentId,
       created: moment().utc().valueOf(),
     }
-    const resp = await addCommentDb(comment)
-    if (resp) setComments([resp, ...comments]);
+    try {
+      const resp = await addCommentDb(comment)
+      if (resp) setComments([...comments, resp]);
+    } catch (err) {
+      console.log('err', err)
+      window.alert('Comment reply failed')
+    }
   };
 
   const getcomments = async () => {
-    const data = await getcommentsDb()
-    if (data) setComments(data);
+    try {
+      const data = await getcommentsDb()
+      setComments(data);
+    } catch (err) {
+      console.log('err', err)
+      window.alert('Fetch all Comments failed')
+    }
   }
 
   useEffect(() => {

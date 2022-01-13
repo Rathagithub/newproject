@@ -3,9 +3,9 @@ const router = express.Router();
 const Storage = require('node-storage');
 const store = new Storage('../storage');
 
-router.get('/getcomments', (req, res) => {
+router.get('/getcomments', async (req, res) => {
  try {
-  const comments = store.get('comments');
+  const comments = await store.get('comments');
   res.status(200).json(comments)
  }
  catch (err) {
@@ -13,11 +13,11 @@ router.get('/getcomments', (req, res) => {
  }
 });
 
-router.post('/save', (req, res) => {
+router.post('/save', async (req, res) => {
  try {
   const id = req.body.id
   const comment = req.body
-  store.put(`comments.${id}`, comment)
+  await store.put(`comments.${id}`, comment)
   res.status(200).json(comment)
  }
  catch (err) {
@@ -25,9 +25,9 @@ router.post('/save', (req, res) => {
  }
 });
 
-router.delete('/delete', (req, res) => {
+router.delete('/delete-all', async (req, res) => {
  try {
-  store.remove(`comments`,)
+  await store.remove(`comments`,)
   res.status(200).json('success')
  }
  catch (err) {

@@ -2,7 +2,6 @@ const cors = require('cors')
 const express = require('express');
 const bodyParser = require('body-parser');
 const routesHandler = require('./routes/Router');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 
@@ -16,7 +15,4 @@ app.listen(PORT, () => {
  console.log("Server is running on port 8001.");
 });
 
-module.exports = function (app) {
- app.use(createProxyMiddleware('/api/**', { target: 'http://localhost:5000' }));
- app.use(createProxyMiddleware('/otherApi/**', { target: 'http://localhost:5000' }));
-};
+module.exports = app
